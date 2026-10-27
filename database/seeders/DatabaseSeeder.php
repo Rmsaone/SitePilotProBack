@@ -21,7 +21,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // ──────────────────────────────
-        $admin = User::factory()->create();
+        $admin = User::factory()->create([
+            'first_name' => 'Jean',
+            'last_name' => 'Dupont',
+            'email' => 'demo@sitepilotpro.fr',
+            'password' => 'Demo#2026',
+        ]);
 
         // ───────────────────────────────────
         $clients = Client::factory(10)->create([

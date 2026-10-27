@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
 use Override;
 
 /**
@@ -23,8 +25,11 @@ use Override;
  * @property string $last_name
  * @property string $email
  * @property string $phone
+ * @property string|null $affiliation_code
  * @property string $password
  * @property UserRole $userRole
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  *
  * - Relations.
  * @property Client $clients
@@ -33,11 +38,11 @@ use Override;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'first_name', 'last_name', 'email',
-        'password', 'phone', 'userRole',
+        'password', 'phone', 'affiliation_code', 'userRole',
     ];
 
     protected $hidden = ['password', 'remember_token'];
