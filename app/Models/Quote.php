@@ -9,11 +9,13 @@ use App\Enums\TvaRate;
 use Cknow\Money\Casts\MoneyIntegerCast;
 use Cknow\Money\Money;
 use Database\Factories\QuoteFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Override;
 
@@ -21,6 +23,7 @@ use Override;
  * - Attributes.
  *
  * @property int $id
+ * @property int $client_id
  * @property string $quote_number
  * @property Carbon $issue_date
  * @property Carbon $validity_date
@@ -31,18 +34,18 @@ use Override;
  * @property Money $tva_amount
  * @property Carbon $created_at
  * @property Carbon $updated_at
- * @property Carbon $deleted_at
+ * @property Carbon|null $deleted_at
  *
  * - Relations.
  * @property Client $client
- * @property ProductLine $productLines
- * @property Worksite $worksites
- * @property InvoiceClient $invoicesClients
+ * @property Collection<int,ProductLine> $productLines
+ * @property Collection<int,Worksite> $worksites
+ * @property Collection<int,InvoiceClient> $invoicesClients
  */
 class Quote extends Model
 {
     /** @use HasFactory<QuoteFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * @var array<int,string>

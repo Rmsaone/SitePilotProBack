@@ -6,16 +6,24 @@ namespace App\Services;
 
 use App\Dto\ClientDto;
 use App\Models\Client;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClientService
 {
     // Retourne la liste de tous les clients.
-    public function list(): LengthAwarePaginator
+    public function list(?string $search = null, int $perPage = 20): LengthAwarePaginator
     {
         return Client::query()
+            ->when($search, function (Builder $query, string $search): void {
+                $query->where(function (Builder $query) use ($search): void {
+                    $query->whereLike('company', "%{$search}%")
+                        ->orWhereLike('contact_name', "%{$search}%")
+                        ->orWhereLike('email', "%{$search}%");
+                });
+            })
             ->latest()
-            ->paginate(20);
+            ->paginate($perPage);
     }
 
     // Crée un nouveau client.

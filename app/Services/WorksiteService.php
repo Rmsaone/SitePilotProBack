@@ -35,6 +35,7 @@ class WorksiteService
                 $worksiteFilterDto->worksiteStatus,
                 fn (Builder $query, WorksiteStatus $status) => $query->where('worksite_status', $status)
             )
+            ->when($worksiteFilterDto->clientId, fn (Builder $query, int $id) => $query->where('client_id', $id))
             ->orderBy($worksiteFilterDto->sort, $worksiteFilterDto->direction)
             ->orderByDesc('id')
             ->paginate($worksiteFilterDto->perPage);

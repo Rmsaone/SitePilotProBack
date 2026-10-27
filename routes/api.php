@@ -56,6 +56,10 @@ Route::prefix('v1')->name('v1.')->group(function (): void {
             ->parameter('clients', 'client_id')
             ->whereNumber('client_id');
 
+        Route::patch('quotes/{quote_id}/status', [QuoteController::class, 'updateStatus'])
+            ->whereNumber('quote_id')
+            ->name('quotes.status');
+
         Route::apiResource('quotes', QuoteController::class)
             ->parameter('quotes', 'quote_id')
             ->whereNumber('quote_id');

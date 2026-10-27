@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Dto\ClientDto;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ClientIndexRequest;
 use App\Http\Requests\ClientRequest;
 use App\Http\Resources\Client\IndexClientResource;
 use App\Http\Resources\Client\ShowClientResource;
@@ -22,10 +23,13 @@ class ClientController extends Controller
     ) {
     }
 
-    public function index(): JsonResponse
+    public function index(ClientIndexRequest $clientIndexRequest): JsonResponse
     {
         return IndexClientResource::collection(
-            $this->clientService->list()
+            $this->clientService->list(
+                $clientIndexRequest->filled('search') ? $clientIndexRequest->string('search')->toString() : null,
+                $clientIndexRequest->filled('per_page') ? $clientIndexRequest->integer('per_page') : 20,
+            )
         )->response();
     }
 

@@ -90,6 +90,16 @@ class WorksiteApiTest extends TestCase
             ->assertJsonCount(2, 'data');
     }
 
+    public function test_should_filter_worksites_by_client(): void
+    {
+        WorksiteFactory::new()->count(2)->create(['client_id' => $this->client->id]);
+        WorksiteFactory::new()->createOne();
+
+        $this->getJson("/api/v1/worksites?client_id={$this->client->id}")
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
+    }
+
     public function test_should_sort_worksites_by_start_date(): void
     {
         WorksiteFactory::new()->createOne(['name_worksite' => 'Tardif', 'start_date' => '2027-01-01']);

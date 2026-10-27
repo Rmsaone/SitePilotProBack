@@ -14,6 +14,7 @@ final readonly class WorksiteFilterDto
         public string $sort,
         public string $direction,
         public int $perPage,
+        public ?int $clientId = null,
     ) {
     }
 
@@ -30,6 +31,7 @@ final readonly class WorksiteFilterDto
             sort: (string) ($data['sort'] ?? 'created_at'),
             direction: (string) ($data['direction'] ?? 'desc'),
             perPage: (int) ($data['per_page'] ?? 20),
+            clientId: isset($data['client_id']) ? (int) $data['client_id'] : null,
         );
     }
 }

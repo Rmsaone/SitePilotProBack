@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Override;
 
 /**
@@ -22,7 +21,7 @@ use Override;
  * @property int $id
  * @property int $quote_id
  * @property string $description
- * @property int $quantity
+ * @property float $quantity
  * @property Unit $unit
  * @property Money $unit_price_ht
  * @property TvaRate $tva_rate
@@ -34,7 +33,7 @@ use Override;
  * @property Carbon $updated_at
  *
  * - Relations.
- * @property Collection<int,Quote>|null $quote
+ * @property Quote $quote
  */
 class ProductLine extends Model
 {
@@ -50,6 +49,7 @@ class ProductLine extends Model
     protected function casts(): array
     {
         return [
+            'quantity' => 'float',
             'unit' => Unit::class,
             'unit_price_ht' => MoneyIntegerCast::class.':EUR',
             'tva_rate' => TvaRate::class,

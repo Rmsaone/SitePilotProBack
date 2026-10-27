@@ -29,6 +29,10 @@ class WorksiteIndexRequest extends FormRequest
                 'nullable',
                 Rule::enum(WorksiteStatus::class),
             ],
+            'client_id' => [
+                'nullable',
+                'integer',
+            ],
             'sort' => [
                 'nullable',
                 Rule::in(self::SORTABLE),
@@ -55,6 +59,7 @@ class WorksiteIndexRequest extends FormRequest
         return [
             'search' => 'Recherche',
             'worksite_status' => 'Statut',
+            'client_id' => 'Client',
             'sort' => 'Tri',
             'direction' => 'Ordre',
             'per_page' => 'Nombre par page',

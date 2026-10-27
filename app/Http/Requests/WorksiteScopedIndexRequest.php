@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use App\Enums\QuoteStatus;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Override;
 
 /**
@@ -16,7 +13,7 @@ use Override;
 class WorksiteScopedIndexRequest extends FormRequest
 {
     /**
-     * @return array<string, array<int,mixed>|ValidationRule>
+     * @return array<string, array<int,string>>
      */
     public function rules(): array
     {
@@ -30,10 +27,6 @@ class WorksiteScopedIndexRequest extends FormRequest
                 'integer',
                 'min:1',
                 'max:100',
-            ],
-            'quote_status' => [
-                'nullable',
-                Rule::enum(QuoteStatus::class),
             ],
         ];
     }
@@ -57,7 +50,6 @@ class WorksiteScopedIndexRequest extends FormRequest
         return [
             'worksite_id' => 'Chantier',
             'per_page' => 'Nombre par page',
-            'quote_status' => 'Statut du devis',
         ];
     }
 }
