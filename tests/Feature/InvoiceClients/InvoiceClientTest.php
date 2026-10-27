@@ -19,6 +19,8 @@ class InvoiceClientTest extends TestCase
     {
         parent::setUp();
 
+        $this->actingAsUser();
+
         $this->invoice = InvoiceClientFactory::new()
 
             ->createOne();

@@ -8,6 +8,7 @@ use App\Http\Resources\Client\IndexClientResource;
 use App\Http\Resources\Quote\IndexQuoteResource;
 use App\Http\Resources\Worksite\IndexWorksiteResource;
 use App\Models\InvoiceClient;
+use App\Models\Quote;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Money\Money;
@@ -35,8 +36,10 @@ final class InvoiceClientResource extends JsonResource
             'number_invoice' => $this->resource->number_invoice,
             'invoice_description' => $this->resource->invoice_description,
             'total_ht' => $totalHt,
+            'tva_rate' => $this->resource->tva_rate->numeric(),
             'payment_date' => $this->resource->payment_date,
-            'payment_status' => $this->resource->payment_status->title(),
+            'payment_status' => $this->resource->payment_status->value,
+            'payment_status_title' => $this->resource->payment_status->title(),
             'payment_method' => $this->resource->payment_method?->title(),
             'client' => $this
                 ->whenLoaded(
@@ -49,7 +52,9 @@ final class InvoiceClientResource extends JsonResource
             'quote' => $this
                 ->whenLoaded(
                     'quote',
-                    fn () => IndexQuoteResource::collection($this->resource->quote)),
+                    fn () => $this->resource->quote instanceof Quote
+                        ? IndexQuoteResource::make($this->resource->quote)
+                        : null),
         ];
     }
 }

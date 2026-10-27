@@ -24,7 +24,8 @@ final readonly class WorksiteDto
         public string $city,
         public int $zip_code,
         public string $country,
-
+        public ?int $quoteId = null,
+        public ?int $userId = null,
     ) {
     }
 
@@ -50,6 +51,8 @@ final readonly class WorksiteDto
             city: (string) $data['city'],
             zip_code: (int) $data['zip_code'],
             country: (string) $data['country'],
+            quoteId: isset($data['quote_id']) ? (int) $data['quote_id'] : null,
+            userId: isset($data['user_id']) ? (int) $data['user_id'] : null,
         );
     }
 }

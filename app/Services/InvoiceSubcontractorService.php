@@ -4,21 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\InvoiceClient;
 use App\Models\InvoiceSubcontractor;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Override;
 
-class InvoiceSubcontractorService
+class InvoiceSubcontractorService extends PurchaseInvoiceService
 {
-    public function list(): LengthAwarePaginator
+    #[Override]
+    protected function modelClass(): string
     {
-        return InvoiceSubcontractor::query()
-            ->with('worksite')
-            ->paginate(20);
-    }
-
-    public function destroy(InvoiceClient $invoiceClient): void
-    {
-        $invoiceClient->delete();
+        return InvoiceSubcontractor::class;
     }
 }

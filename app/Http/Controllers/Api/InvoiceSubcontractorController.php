@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Dto\PurchaseInvoiceDto;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PurchaseInvoiceRequest;
+use App\Http\Requests\WorksiteScopedIndexRequest;
 use App\Http\Resources\InvoiceGen\InvoiceGenResource;
 use App\Models\InvoiceSubcontractor;
 use App\Services\InvoiceSubcontractorService;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class InvoiceSubcontractorController extends Controller
 {
@@ -17,61 +22,58 @@ class InvoiceSubcontractorController extends Controller
     ) {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(WorksiteScopedIndexRequest $worksiteScopedIndexRequest): JsonResponse
     {
         return InvoiceGenResource::collection(
-            $this->invoiceSubcontractorService->list()
+            $this->invoiceSubcontractorService->list(
+                $worksiteScopedIndexRequest->worksiteId(),
+                $worksiteScopedIndexRequest->perPage(),
+            )
         )->response();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(PurchaseInvoiceRequest $purchaseInvoiceRequest): JsonResponse
     {
+        $validated = $purchaseInvoiceRequest->safe()->toArray();
 
+        /** @var InvoiceSubcontractor $invoice */
+        $invoice = DB::transaction(
+            fn () => $this->invoiceSubcontractorService->store(
+                PurchaseInvoiceDto::fromArray($validated)
+            )
+        );
+
+        return InvoiceGenResource::make($invoice)
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
+    public function update(
+        int $invoice_subcontractor_id,
+        PurchaseInvoiceRequest $purchaseInvoiceRequest
+    ): JsonResponse {
+        $validated = $purchaseInvoiceRequest->safe()->toArray();
 
+        /** @var InvoiceSubcontractor $invoice */
+        $invoice = InvoiceSubcontractor::query()->findOrFail($invoice_subcontractor_id);
+
+        $updatedInvoice = DB::transaction(
+            fn () => $this->invoiceSubcontractorService->update(
+                $invoice,
+                PurchaseInvoiceDto::fromArray($validated)
+            )
+        );
+
+        return InvoiceGenResource::make($updatedInvoice)->response();
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(InvoiceSubcontractor $invoiceSubcontractor)
+    public function destroy(int $invoice_subcontractor_id): JsonResponse
     {
+        /** @var InvoiceSubcontractor $invoice */
+        $invoice = InvoiceSubcontractor::query()->findOrFail($invoice_subcontractor_id);
 
-    }
+        $this->invoiceSubcontractorService->destroy($invoice);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(InvoiceSubcontractor $invoiceSubcontractor)
-    {
-
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, InvoiceSubcontractor $invoiceSubcontractor)
-    {
-
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(InvoiceSubcontractor $invoiceSubcontractor)
-    {
-
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -27,11 +27,13 @@ final class IndexWorksiteResource extends JsonResource
                 ->whenLoaded(
                     'client',
                     fn () => IndexClientResource::make($this->resource->client)),
+            'code' => $this->resource->code,
             'name_worksite' => $this->resource->name_worksite,
             'start_date' => $this->resource->start_date,
             'end_date' => $this->resource->end_date,
             'worksite_priority' => $this->resource->worksite_priority,
             'worksite_status' => $this->resource->worksite_status,
+            'city' => $this->resource->city,
             'zip_code' => $this->resource->zip_code,
 
         ];

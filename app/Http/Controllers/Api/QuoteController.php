@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\QuoteStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\WorksiteScopedIndexRequest;
 use App\Http\Resources\Quote\IndexQuoteResource;
 use App\Http\Resources\Quote\ShowQuoteResource;
 use App\Models\Quote;
 use App\Services\QuoteService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class QuoteController extends Controller
@@ -21,10 +24,18 @@ class QuoteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(WorksiteScopedIndexRequest $worksiteScopedIndexRequest): JsonResponse
     {
+        $quoteStatus = $worksiteScopedIndexRequest->filled('quote_status')
+            ? QuoteStatus::tryFrom($worksiteScopedIndexRequest->string('quote_status')->toString())
+            : null;
+
         return IndexQuoteResource::collection(
-            $this->quoteService->list()
+            $this->quoteService->list(
+                $worksiteScopedIndexRequest->worksiteId(),
+                $quoteStatus,
+                $worksiteScopedIndexRequest->perPage(15),
+            )
         )->response();
     }
 

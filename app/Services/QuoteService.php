@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\QuoteStatus;
 use App\Models\Quote;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class QuoteService
 {
-    public function list(): LengthAwarePaginator
-    {
+    public function list(
+        ?int $worksiteId = null,
+        ?QuoteStatus $quoteStatus = null,
+        int $perPage = 15
+    ): LengthAwarePaginator {
         return Quote::query()
             ->with([
                 'client',
@@ -18,9 +23,13 @@ class QuoteService
                 'worksites',
             ])
             ->withCount('productLines')
+            ->when($worksiteId, fn (Builder $query, int $id) => $query->whereHas(
+                'worksites',
+                fn (Builder $query) => $query->where('worksites.id', $id)
+            ))
+            ->when($quoteStatus, fn (Builder $query, QuoteStatus $status) => $query->where('quote_status', $status))
             ->latest()
-            ->paginate(15
-            );
+            ->paginate($perPage);
     }
 
     //    public function store(Quote $quote): Quote

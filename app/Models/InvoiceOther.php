@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Override;
 
 /**
@@ -29,7 +28,7 @@ use Override;
  * @property Carbon $updated_at
  *
  * - Relations.
- * @property Collection<int,Worksite>|null $worksite
+ * @property Worksite $worksite
  */
 class InvoiceOther extends Model
 {

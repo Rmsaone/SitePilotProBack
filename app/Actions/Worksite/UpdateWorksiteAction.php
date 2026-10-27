@@ -19,17 +19,26 @@ final class UpdateWorksiteAction
     ): Worksite {
         $worksite->update([
             'client_id' => $worksiteDto->client_id,
-            'code' => $worksiteDto->code ?? 'FR'.random_int(10000, 99999).'A',
+            'code' => $worksiteDto->code ?? $worksite->code ?? 'FR'.random_int(10000, 99999).'A',
             'name_worksite' => $worksiteDto->nameWorksite,
             'description' => $worksiteDto->description,
             'start_date' => $worksiteDto->startDate,
             'end_date' => $worksiteDto->endDate,
             'worksite_priority' => $worksiteDto->worksitePriority,
+            'worksite_status' => $worksiteDto->worksiteStatus,
             'street' => $worksiteDto->street,
             'city' => $worksiteDto->city,
             'zip_code' => $worksiteDto->zip_code,
             'country' => $worksiteDto->country,
         ]);
+
+        if ($worksiteDto->quoteId !== null) {
+            $worksite->quotes()->syncWithoutDetaching([$worksiteDto->quoteId]);
+        }
+
+        if ($worksiteDto->userId !== null) {
+            $worksite->users()->sync([$worksiteDto->userId]);
+        }
 
         return $worksite->refresh();
     }
