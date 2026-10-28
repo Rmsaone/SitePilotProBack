@@ -24,6 +24,8 @@ use Override;
  * @property string $invoice_description
  * @property Money $purchase_price
  * @property Money $cost_price
+ * @property string|null $attachment_path
+ * @property string|null $attachment_name
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *

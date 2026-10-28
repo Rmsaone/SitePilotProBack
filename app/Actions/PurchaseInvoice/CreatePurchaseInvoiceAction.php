@@ -31,6 +31,8 @@ final class CreatePurchaseInvoiceAction
             'cost_price' => $purchaseInvoiceDto->costPrice,
         ]);
 
+        StorePurchaseInvoiceAttachment::store($invoice, $purchaseInvoiceDto->attachment);
+
         return $invoice;
     }
 }

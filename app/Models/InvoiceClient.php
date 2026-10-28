@@ -34,6 +34,7 @@ use Override;
  * @property PaymentMethod|null $payment_method
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  *
  * - Relations.
  * @property Worksite $worksite

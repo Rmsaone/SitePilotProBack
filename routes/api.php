@@ -68,8 +68,26 @@ Route::prefix('v1')->name('v1.')->group(function (): void {
             ->parameter('product_lines', 'product_line_id')
             ->whereNumber('product_line_id');
 
+        Route::post('quotes/{quote_id}/invoice', [QuoteController::class, 'convertToInvoice'])
+            ->whereNumber('quote_id')
+            ->name('quotes.invoice');
+
+        Route::patch('invoice_clients/{invoice_client_id}/payment', [InvoiceClientController::class, 'updatePayment'])
+            ->whereNumber('invoice_client_id')
+            ->name('invoice_clients.payment');
+
         Route::apiResource('invoice_clients', InvoiceClientController::class)
-            ->only('index');
+            ->only(['index', 'show', 'destroy'])
+            ->parameter('invoice_clients', 'invoice_client_id')
+            ->whereNumber('invoice_client_id');
+
+        foreach (['invoice_suppliers' => InvoiceSupplierController::class, 'invoice_subcontractors' => InvoiceSubcontractorController::class, 'invoice_others' => InvoiceOtherController::class] as $resource => $controller) {
+            $parameter = rtrim($resource, 's').'_id';
+
+            Route::get("{$resource}/{{$parameter}}/attachment", [$controller, 'attachment'])
+                ->whereNumber($parameter)
+                ->name("{$resource}.attachment");
+        }
 
         Route::apiResource('invoice_suppliers', InvoiceSupplierController::class)
             ->except('show')

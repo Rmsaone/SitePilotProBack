@@ -46,6 +46,12 @@ class PurchaseInvoiceRequest extends FormRequest
                 'min:0',
                 'max:9999999',
             ],
+            'attachment' => [
+                'nullable',
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
+                'max:10240',
+            ],
         ];
     }
 
@@ -62,6 +68,7 @@ class PurchaseInvoiceRequest extends FormRequest
             'invoice_description' => 'Libellé',
             'purchase_price' => "Prix d'achat HT",
             'cost_price' => 'Prix de revient HT',
+            'attachment' => 'Pièce jointe',
         ];
     }
 }

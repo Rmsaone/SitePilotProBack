@@ -34,11 +34,13 @@ class InvoiceGenResource extends JsonResource
         return [
             'id' => $this->resource->id,
             'worksite_id' => $this->resource->worksite_id,
-            'delivery_date' => $this->resource->delivery_date,
+            'delivery_date' => $this->resource->delivery_date->toDateString(),
             'number_invoice' => $this->resource->number_invoice,
             'invoice_description' => $this->resource->invoice_description,
             'purchase_price' => $purchasePrice,
             'cost_price' => $cost_price,
+            'has_attachment' => $this->resource->attachment_path !== null,
+            'attachment_name' => $this->resource->attachment_name,
             'worksite' => $this
                 ->whenLoaded(
                     'worksite',

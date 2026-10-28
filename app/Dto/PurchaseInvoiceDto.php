@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Dto;
 
 use Cknow\Money\Money;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 
 /**
@@ -20,6 +21,7 @@ final readonly class PurchaseInvoiceDto
         public string $invoiceDescription,
         public Money $purchasePrice,
         public Money $costPrice,
+        public ?UploadedFile $attachment = null,
     ) {
     }
 
@@ -35,6 +37,7 @@ final readonly class PurchaseInvoiceDto
             invoiceDescription: (string) $data['invoice_description'],
             purchasePrice: Money::EUR((int) round((float) $data['purchase_price'] * 100)),
             costPrice: Money::EUR((int) round((float) $data['cost_price'] * 100)),
+            attachment: ($data['attachment'] ?? null) instanceof UploadedFile ? $data['attachment'] : null,
         );
     }
 }

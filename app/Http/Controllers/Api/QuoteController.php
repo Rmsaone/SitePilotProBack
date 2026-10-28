@@ -8,14 +8,19 @@ use App\Dto\QuoteDto;
 use App\Dto\QuoteFilterDto;
 use App\Enums\QuoteStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ConvertQuoteToInvoiceRequest;
 use App\Http\Requests\QuoteIndexRequest;
 use App\Http\Requests\QuoteRequest;
 use App\Http\Requests\UpdateQuoteStatusRequest;
+use App\Http\Resources\InvoiceClient\ShowInvoiceClientResource;
 use App\Http\Resources\Quote\IndexQuoteResource;
 use App\Http\Resources\Quote\ShowQuoteResource;
+use App\Models\InvoiceClient;
 use App\Models\Quote;
+use App\Services\InvoiceClientService;
 use App\Services\QuoteService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -103,6 +108,33 @@ class QuoteController extends Controller
         $updatedQuote->loadMissing('client');
 
         return IndexQuoteResource::make($updatedQuote)->response();
+    }
+
+    public function convertToInvoice(
+        int $quote_id,
+        ConvertQuoteToInvoiceRequest $convertQuoteToInvoiceRequest,
+        InvoiceClientService $invoiceClientService,
+    ): JsonResponse {
+        /** @var Quote $quote */
+        $quote = Quote::query()->findOrFail($quote_id);
+
+        $validated = $convertQuoteToInvoiceRequest->safe()->toArray();
+
+        /** @var InvoiceClient $invoice */
+        $invoice = DB::transaction(
+            fn () => $invoiceClientService->createFromQuote(
+                $quote,
+                isset($validated['worksite_id']) ? (int) $validated['worksite_id'] : null,
+                isset($validated['delivery_date']) ? Carbon::parse($validated['delivery_date']) : null,
+                isset($validated['invoice_description']) ? (string) $validated['invoice_description'] : null,
+            )
+        );
+
+        $invoice->loadMissing(InvoiceClientController::SHOW_RELATIONS);
+
+        return ShowInvoiceClientResource::make($invoice)
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
     public function destroy(int $quote_id): JsonResponse

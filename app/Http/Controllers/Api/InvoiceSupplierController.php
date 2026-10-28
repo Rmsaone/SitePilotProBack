@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\PurchaseInvoice\StorePurchaseInvoiceAttachment;
 use App\Dto\PurchaseInvoiceDto;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PurchaseInvoiceRequest;
@@ -14,6 +15,7 @@ use App\Services\InvoiceSupplierService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class InvoiceSupplierController extends Controller
 {
@@ -65,6 +67,14 @@ class InvoiceSupplierController extends Controller
         );
 
         return InvoiceGenResource::make($updatedInvoice)->response();
+    }
+
+    public function attachment(int $invoice_supplier_id): StreamedResponse
+    {
+        /** @var InvoiceSupplier $invoice */
+        $invoice = InvoiceSupplier::query()->findOrFail($invoice_supplier_id);
+
+        return StorePurchaseInvoiceAttachment::download($invoice);
     }
 
     public function destroy(int $invoice_supplier_id): JsonResponse
