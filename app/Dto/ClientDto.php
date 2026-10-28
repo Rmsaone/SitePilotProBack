@@ -19,8 +19,9 @@ final readonly class ClientDto
         public int $zipCode,
         public string $country,
         public ClientType $clientType,
-        public string $siret,
-        public string $tvaIntra,
+        public ?string $siret,
+        public ?string $tvaIntra,
+        public int $userId,
     ) {
     }
 
@@ -29,21 +30,48 @@ final readonly class ClientDto
      */
     public static function fromArray(array $data): self
     {
+        $clientType = $data['client_type'] instanceof ClientType
+            ? $data['client_type']
+            : ClientType::from((string) $data['client_type']);
+        $isPro = $clientType === ClientType::Pro;
+
         return new self(
-            contactName: $data['contact_name'],
-            privateName: $data['private_name'] ?? null,
-            email: $data['email'],
-            company: $data['company'] ?? null,
-            phone: $data['phone'],
-            street: $data['street'],
-            city: $data['city'],
+            contactName: (string) $data['contact_name'],
+            privateName: isset($data['private_name']) ? (string) $data['private_name'] : null,
+            email: (string) $data['email'],
+            company: isset($data['company']) ? (string) $data['company'] : null,
+            phone: (string) $data['phone'],
+            street: (string) $data['street'],
+            city: (string) $data['city'],
             zipCode: (int) $data['zip_code'],
-            country: $data['country'],
-            clientType: $data['clientType'] instanceof ClientType
-                ? $data['clientType']
-                : ClientType::from($data['clientType']),
-            siret: $data['siret'],
-            tvaIntra: $data['tva_intra'],
+            country: (string) $data['country'],
+            clientType: $clientType,
+            // A private client never keeps company identifiers.
+            siret: $isPro && isset($data['siret']) ? (string) $data['siret'] : null,
+            tvaIntra: $isPro && isset($data['tva_intra']) ? (string) $data['tva_intra'] : null,
+            userId: (int) $data['user_id'],
         );
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function attributes(): array
+    {
+        return [
+            'user_id' => $this->userId,
+            'contact_name' => $this->contactName,
+            'private_name' => $this->privateName,
+            'email' => $this->email,
+            'company' => $this->company,
+            'phone' => $this->phone,
+            'street' => $this->street,
+            'city' => $this->city,
+            'zip_code' => $this->zipCode,
+            'country' => $this->country,
+            'clientType' => $this->clientType,
+            'siret' => $this->siret,
+            'tva_intra' => $this->tvaIntra,
+        ];
     }
 }

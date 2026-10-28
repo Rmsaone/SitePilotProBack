@@ -19,6 +19,7 @@ use Override;
  * - Attributes.
  *
  * @property int $id
+ * @property int $user_id
  * @property string $contact_name
  * @property string|null $private_name
  * @property string $email
@@ -29,8 +30,8 @@ use Override;
  * @property string $city
  * @property int $zip_code
  * @property string $country
- * @property string $siret
- * @property string $tva_intra
+ * @property string|null $siret
+ * @property string|null $tva_intra
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *

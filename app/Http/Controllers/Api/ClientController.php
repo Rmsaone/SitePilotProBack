@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Dto\ClientDto;
+use App\Dto\ClientFilterDto;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientIndexRequest;
 use App\Http\Requests\ClientRequest;
@@ -27,14 +28,18 @@ class ClientController extends Controller
     {
         return IndexClientResource::collection(
             $this->clientService->list(
-                $clientIndexRequest->filled('search') ? $clientIndexRequest->string('search')->toString() : null,
-                $clientIndexRequest->filled('per_page') ? $clientIndexRequest->integer('per_page') : 20,
+                ClientFilterDto::fromArray($clientIndexRequest->safe()->toArray())
             )
         )->response();
     }
 
-    public function show(Client $client): JsonResponse
+    public function show(int $client_id): JsonResponse
     {
+        /** @var Client $client */
+        $client = Client::query()->findOrFail($client_id);
+
+        $client->loadMissing('user')->loadCount(ClientService::COUNTS);
+
         return ShowClientResource::make($client)->response();
     }
 
@@ -49,38 +54,41 @@ class ClientController extends Controller
             )
         );
 
-        return IndexClientResource::make($createdClient)
+        $createdClient->loadMissing('user')->loadCount(ClientService::COUNTS);
+
+        return ShowClientResource::make($createdClient)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
 
     public function update(
-        Client $client,
+        int $client_id,
         ClientRequest $clientRequest
     ): JsonResponse {
-        $clientDto = ClientDto::fromArray(
-            $clientRequest->safe()->toArray()
-        );
+        $validated = $clientRequest->safe()->toArray();
 
-        /** @var Client $updatedClient */
+        /** @var Client $client */
+        $client = Client::query()->findOrFail($client_id);
+
         $updatedClient = DB::transaction(
             fn () => $this->clientService->update(
                 $client,
-                $clientDto
+                ClientDto::fromArray($validated)
             )
         );
 
-        return IndexClientResource::make($updatedClient)
-            ->response();
+        $updatedClient->loadMissing('user')->loadCount(ClientService::COUNTS);
+
+        return ShowClientResource::make($updatedClient)->response();
     }
 
-    public function destroy(Client $client): JsonResponse
+    public function destroy(int $client_id): JsonResponse
     {
-        $client->delete();
+        /** @var Client $client */
+        $client = Client::query()->findOrFail($client_id);
 
-        return response()->json(
-            null,
-            Response::HTTP_NO_CONTENT
-        );
+        $this->clientService->destroy($client);
+
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }
