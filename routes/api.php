@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\InvoiceClientController;
 use App\Http\Controllers\Api\InvoiceOtherController;
 use App\Http\Controllers\Api\InvoiceSubcontractorController;
@@ -40,6 +41,8 @@ Route::prefix('v1')->name('v1.')->group(function (): void {
         });
 
         Route::get('users', [UserController::class, 'index'])->name('users.index');
+
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::patch('worksites/{worksite_id}/status', [WorksiteController::class, 'updateStatus'])
             ->whereNumber('worksite_id')
