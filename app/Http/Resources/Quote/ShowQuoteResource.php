@@ -4,57 +4,44 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Quote;
 
-use App\Http\Resources\Client\IndexClientResource;
+use App\Http\Resources\Client\ShowClientResource;
 use App\Http\Resources\ProductLine\IndexProductLineResource;
-use App\Http\Resources\Worksite\IndexWorksiteResource;
 use App\Models\Quote;
-use Cknow\Money\Money;
+use App\Models\Worksite;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Override;
 
 /**
  * @property Quote $resource
  */
-class ShowQuoteResource extends JsonResource
+class ShowQuoteResource extends IndexQuoteResource
 {
     /**
-     * Transform the resource into an array.
-     *
      * @return array<string, mixed>
      */
     #[Override]
     public function toArray(Request $request): array
     {
-        /** @var Money|null $subtotalHt */
-        $subtotalHt = $this->resource->subtotal_ht;
-        /** @var Money|null $tvaAmount */
-        $tvaAmount = $this->resource->tva_amount;
-        /** @var Money|null $totalTtc */
-        $totalTtc = $this->resource->total_ttc;
-
         return [
-            'id' => $this->resource->id,
-            'quote_number' => $this->resource->quote_number,
-            'issue_date' => $this->resource->issue_date->format('d/m/Y'),
-            'validity_date' => $this->resource->validity_date->format('d/m/Y'),
-            'quote_status' => $this->resource->quote_status,
-            'subtotal_ht' => $subtotalHt,
-            'tva_rate' => $this->resource->tva_rate,
-            'tva_amount' => $tvaAmount,
-            'total_ttc' => $totalTtc,
+            ...parent::toArray($request),
+            'tva_rate_title' => $this->resource->tva_rate->title(),
             'client' => $this
                 ->whenLoaded(
                     'client',
-                    fn () => IndexClientResource::make($this->resource->client)),
+                    fn () => ShowClientResource::make($this->resource->client)),
             'worksites' => $this
                 ->whenLoaded(
                     'worksites',
-                    fn () => IndexWorksiteResource::collection($this->resource->worksites)),
+                    fn () => $this->resource->worksites->map(fn (Worksite $worksite): array => [
+                        'id' => $worksite->id,
+                        'name_worksite' => $worksite->name_worksite,
+                    ])),
             'product_lines' => $this
                 ->whenLoaded(
                     'productLines',
-                    fn () => IndexProductLineResource::collection($this->resource->productLines)),
+                    fn () => IndexProductLineResource::collection(
+                        $this->resource->productLines->sortBy('sort_order')->values()
+                    )),
             'product_lines_count' => $this->whenCounted('productLines'),
         ];
     }

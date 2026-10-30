@@ -19,6 +19,8 @@ class ClientTest extends TestCase
     {
         parent::setUp();
 
+        $this->actingAsUser();
+
         $this->client = ClientFactory::new()->createOne();
     }
 

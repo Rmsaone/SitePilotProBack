@@ -17,7 +17,8 @@ final class CreateWorksiteAction
         WorksiteDto $worksiteDto,
     ): Worksite {
 
-        return Worksite::query()->create([
+        /** @var Worksite $worksite */
+        $worksite = Worksite::query()->create([
             'client_id' => $worksiteDto->client_id,
             'code' => $worksiteDto->code ?? 'FR'.random_int(10000, 99999).'A',
             'name_worksite' => $worksiteDto->nameWorksite,
@@ -31,5 +32,15 @@ final class CreateWorksiteAction
             'zip_code' => $worksiteDto->zip_code,
             'country' => $worksiteDto->country,
         ]);
+
+        if ($worksiteDto->quoteId !== null) {
+            $worksite->quotes()->attach($worksiteDto->quoteId);
+        }
+
+        if ($worksiteDto->userId !== null) {
+            $worksite->users()->attach($worksiteDto->userId);
+        }
+
+        return $worksite;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Enums\QuoteStatus;
 use App\Enums\WorksitePriority;
 use App\Enums\WorksiteStatus;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -23,6 +24,20 @@ class WorksiteRequest extends FormRequest
                 'required',
                 'integer',
                 'exists:clients,id',
+            ],
+            // An accepted quote of the same client is required to open a worksite.
+            'quote_id' => [
+                Rule::requiredIf($this->isMethod('post')),
+                'nullable',
+                'integer',
+                Rule::exists('quotes', 'id')
+                    ->where('quote_status', QuoteStatus::Accept->value)
+                    ->where('client_id', $this->integer('client_id')),
+            ],
+            'user_id' => [
+                'nullable',
+                'integer',
+                'exists:users,id',
             ],
             'name_worksite' => [
                 'nullable',
@@ -82,12 +97,17 @@ class WorksiteRequest extends FormRequest
     {
         return [
             'client_id' => 'Client',
+            'quote_id' => 'Devis accepté lié',
+            'user_id' => 'Responsable du chantier',
+            'name_worksite' => 'Nom du chantier',
             'name' => 'Le nom du chantier',
             'description' => 'Description',
             'start_date' => 'Date prévu de début',
             'end_date' => 'Date prévu de fin ',
             'priority' => 'Priorité',
+            'worksite_priority' => 'Priorité',
             'status' => 'WorksiteStatus',
+            'worksite_status' => 'Statut',
             'street' => 'Rue',
             'city' => 'Ville',
             'zip_code' => 'Code postal',

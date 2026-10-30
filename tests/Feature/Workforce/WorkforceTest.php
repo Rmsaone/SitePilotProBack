@@ -19,6 +19,8 @@ class WorkforceTest extends TestCase
     {
         parent::setUp();
 
+        $this->actingAsUser();
+
         $this->workforce = WorkforceFactory::new()->createOne();
     }
 

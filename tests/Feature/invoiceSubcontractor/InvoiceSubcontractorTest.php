@@ -19,6 +19,8 @@ class InvoiceSubcontractorTest extends TestCase
     {
         parent::setUp();
 
+        $this->actingAsUser();
+
         $this->invoice = InvoiceSubcontractorFactory::new()
             ->createOne();
     }

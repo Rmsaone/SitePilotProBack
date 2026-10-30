@@ -23,6 +23,8 @@ class WorksiteTest extends TestCase
     {
         parent::setUp();
 
+        $this->actingAsUser();
+
         $this->client = ClientFactory::new()->createOne();
         $this->worksite = WorksiteFactory::new()
             ->createOne();

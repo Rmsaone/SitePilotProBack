@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Override;
 
 /**
@@ -22,7 +21,7 @@ use Override;
  * @property int $worksite_id
  * @property string $code
  * @property string $worker
- * @property int $hr_working
+ * @property float $hr_working
  * @property Money $hr_rate
  * @property Money $cost_hr_working
  * @property Money $additional_costs
@@ -31,7 +30,7 @@ use Override;
  * @property Carbon $updated_at
  *
  * - Relations.
- * @property Collection<int,Worksite>|null $worksite
+ * @property Worksite $worksite
  */
 class Workforce extends Model
 {
@@ -47,6 +46,7 @@ class Workforce extends Model
     protected function casts(): array
     {
         return [
+            'hr_working' => 'float',
             'hr_rate' => MoneyIntegerCast::class.':EUR',
             'cost_hr_working' => MoneyIntegerCast::class.':EUR',
             'additional_costs' => MoneyIntegerCast::class.':EUR',

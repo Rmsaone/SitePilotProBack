@@ -21,6 +21,8 @@ class DeleteWorksiteTest extends TestCase
     {
         parent::setUp();
 
+        $this->actingAsUser();
+
         $client = ClientFactory::new()->createOne();
 
         $this->worksite = WorksiteFactory::new()

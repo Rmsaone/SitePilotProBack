@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Client;
 
+use App\Http\Resources\User\IndexUserResource;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -12,7 +13,7 @@ use Override;
 /**
  * @property Client $resource
  */
-final class IndexClientResource extends JsonResource
+class IndexClientResource extends JsonResource
 {
     /**
      * @return array<string,mixed>
@@ -27,7 +28,17 @@ final class IndexClientResource extends JsonResource
             'email' => $this->resource->email,
             'company' => $this->resource->company,
             'phone' => $this->resource->phone,
-            'clientType' => $this->resource->clientType,
+            'city' => $this->resource->city,
+            'zip_code' => $this->resource->zip_code,
+            'client_type' => $this->resource->clientType->value,
+            'client_type_title' => $this->resource->clientType->title(),
+            'responsible' => $this
+                ->whenLoaded(
+                    'user',
+                    fn () => IndexUserResource::make($this->resource->user)),
+            'worksites_count' => $this->whenCounted('worksites'),
+            'quotes_count' => $this->whenCounted('quotes'),
+            'invoices_count' => $this->whenCounted('invoicesClient'),
         ];
     }
 }

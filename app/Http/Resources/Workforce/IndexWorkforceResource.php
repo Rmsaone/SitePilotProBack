@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Workforce;
 
+use App\Models\Workforce;
 use Cknow\Money\Money;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Override;
 
+/**
+ * @property Workforce $resource
+ */
 class IndexWorkforceResource extends JsonResource
 {
     /**

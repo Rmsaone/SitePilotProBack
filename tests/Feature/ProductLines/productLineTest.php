@@ -19,6 +19,8 @@ class productLineTest extends TestCase
     {
         parent::setUp();
 
+        $this->actingAsUser();
+
         $this->invoice = ProductLineFactory::new()
             ->createOne();
     }

@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Dto\WorkforceDto;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\WorkforceRequest;
+use App\Http\Requests\WorksiteScopedIndexRequest;
 use App\Http\Resources\Workforce\IndexWorkforceResource;
 use App\Models\Workforce;
 use App\Services\WorkforceService;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class WorkforceController extends Controller
 {
@@ -17,53 +22,58 @@ class WorkforceController extends Controller
     ) {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(WorksiteScopedIndexRequest $worksiteScopedIndexRequest): JsonResponse
     {
         return IndexWorkforceResource::collection(
-            $this->workforceService->list()
+            $this->workforceService->list(
+                $worksiteScopedIndexRequest->worksiteId(),
+                $worksiteScopedIndexRequest->perPage(15),
+            )
         )->response();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(WorkforceRequest $workforceRequest): JsonResponse
     {
+        $validated = $workforceRequest->safe()->toArray();
 
+        /** @var Workforce $workforce */
+        $workforce = DB::transaction(
+            fn () => $this->workforceService->store(
+                WorkforceDto::fromArray($validated)
+            )
+        );
+
+        return IndexWorkforceResource::make($workforce)
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Workforce $workforce)
-    {
+    public function update(
+        int $workforce_id,
+        WorkforceRequest $workforceRequest
+    ): JsonResponse {
+        $validated = $workforceRequest->safe()->toArray();
 
+        /** @var Workforce $workforce */
+        $workforce = Workforce::query()->findOrFail($workforce_id);
+
+        $updatedWorkforce = DB::transaction(
+            fn () => $this->workforceService->update(
+                $workforce,
+                WorkforceDto::fromArray($validated)
+            )
+        );
+
+        return IndexWorkforceResource::make($updatedWorkforce)->response();
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Workforce $workforce)
+    public function destroy(int $workforce_id): JsonResponse
     {
+        /** @var Workforce $workforce */
+        $workforce = Workforce::query()->findOrFail($workforce_id);
 
-    }
+        $this->workforceService->destroy($workforce);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Workforce $workforce)
-    {
-
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Workforce $workforce)
-    {
-
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }

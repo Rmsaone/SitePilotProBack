@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\WorksitePriority;
 use App\Enums\WorksiteStatus;
 use Database\Factories\WorksiteFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -36,13 +37,13 @@ use Override;
  *
  * - Relations.
  * @property Client $client
- * @property User $users
- * @property Quote $quotes
- * @property InvoiceClient $invoiceClients
- * @property InvoiceSupplier $invoiceSuppliers
- * @property InvoiceSubcontractor $invoiceSubcontractors
- * @property InvoiceOther $invoiceOthers
- * @property Workforce $workforce
+ * @property Collection<int,User> $users
+ * @property Collection<int,Quote> $quotes
+ * @property Collection<int,InvoiceClient> $invoiceClients
+ * @property Collection<int,InvoiceSupplier> $invoiceSuppliers
+ * @property Collection<int,InvoiceSubcontractor> $invoiceSubcontractors
+ * @property Collection<int,InvoiceOther> $invoiceOthers
+ * @property Collection<int,Workforce> $workforce
  */
 class Worksite extends Model
 {
