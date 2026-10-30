@@ -35,8 +35,9 @@ class AuthController extends Controller
             )
         );
 
+        $this->authService->login($registerRequest, $user);
+
         return response()->json([
-            'token' => $this->authService->createToken($user),
             'user' => ShowUserResource::make($user),
         ], Response::HTTP_CREATED);
     }
@@ -56,8 +57,9 @@ class AuthController extends Controller
             ]);
         }
 
+        $this->authService->login($loginRequest, $user);
+
         return response()->json([
-            'token' => $this->authService->createToken($user),
             'user' => ShowUserResource::make($user),
         ]);
     }
@@ -72,10 +74,7 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-
-        $this->authService->logout($user);
+        $this->authService->logout($request);
 
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
@@ -85,7 +84,7 @@ class AuthController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        $this->authService->logoutEverywhere($user);
+        $this->authService->logoutEverywhere($request, $user);
 
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
